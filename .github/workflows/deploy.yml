@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies & run tests
         run: |
           pip install -r requirements.txt pytest httpx
-          python -m pytest -v
+          PYTHONPATH=. python -m pytest -v
 
       # 3. Log in to AWS & Amazon ECR
       - name: Configure AWS credentials
