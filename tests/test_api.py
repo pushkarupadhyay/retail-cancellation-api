@@ -1,12 +1,19 @@
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from fastapi.testclient import TestClient
 from src.app import app
 
 client = TestClient(app)
 
+
 def test_health_endpoint():
     response = client.get("/health")
     assert response.status_code == 200
     assert response.json()["status"] == "healthy"
+
 
 def test_predict_valid_order():
     payload = {
@@ -15,7 +22,7 @@ def test_predict_valid_order():
         "Hour": 14,
         "DayOfWeek": 2,
         "Month": 11,
-        "Country": "United Kingdom"
+        "Country": "United Kingdom",
     }
     response = client.post("/predict", json=payload)
     assert response.status_code == 200
@@ -24,6 +31,7 @@ def test_predict_valid_order():
     assert "cancellation_probability" in data
     assert 0.0 <= data["cancellation_probability"] <= 1.0
 
+
 def test_predict_rejects_negative_price():
     bad_payload = {
         "AbsQuantity": 12,
@@ -31,7 +39,7 @@ def test_predict_rejects_negative_price():
         "Hour": 14,
         "DayOfWeek": 2,
         "Month": 11,
-        "Country": "United Kingdom"
+        "Country": "United Kingdom",
     }
     response = client.post("/predict", json=bad_payload)
     assert response.status_code == 422  # Pydantic validation blocks bad data
